@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Visualization Dashboard</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+            color: #333;
+        }
+
+        .button-container {
+            text-align: center;
+            margin: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .plot-container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .plot-item {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .plot-item h2 {
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        .plot-item img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Data Visualization Dashboard</h1>
+    <div class="button-container">
+        <button id="generateReport">Generate Report</button>
+    </div>
+    <div class="plot-container">
+        <h2>Plots</h2>
+        <div id="plots">
+            <!-- Plot images will be inserted here -->
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('generateReport').addEventListener('click', function() {
+            fetch('/generate_report')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.plots) {
+                        loadPlots(data.plots);
+                    } else if (data.error) {
+                        alert('Error: ' + data.error);
+                    }
+                });
+        });
+
+        function loadPlots(plots) {
+            const plotContainer = document.getElementById('plots');
+            plotContainer.innerHTML = '';  // Clear existing plots
+
+            // Define plot titles
+            const titles = {
+                'pie_chart.png': 'Category-wise Stock Distribution',
+                'time_series.png': 'Stock Level Over Time (Top 5 Sold Medicines)',
+                'expiry_chart.png': 'Medicines Expiry Distribution by Year'
+            };
+
+            plots.forEach(plot => {
+                const plotDiv = document.createElement('div');
+                plotDiv.className = 'plot-item';
+
+                const h2 = document.createElement('h2');
+                h2.textContent = titles[plot] || 'Plot';  // Default title if not found
+
+                const img = document.createElement('img');
+                img.src = `/plot/${plot}`;
+                img.alt = h2.textContent;
+
+                plotDiv.appendChild(h2);
+                plotDiv.appendChild(img);
+
+                plotContainer.appendChild(plotDiv);
+            });
+        }
+    </script>
+</body>
+</html>
